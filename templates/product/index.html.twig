@@ -1,0 +1,113 @@
+{# templates/product/index.html.twig #}
+{# Vista reutilitzable del llistat de productes. #}
+{# Paràmetres opcionals: title, show_actions, show_new_button, empty_message #}
+{# Principi DRY: reutilitzada tant per al llistat públic com per "Els meus productes". #}
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title|default('Productes') }} - SymfoPop{% endblock %}
+
+{% block body %}
+    {# Capçalera amb títol i botó de nou producte (si correspon) #}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-0">
+            <i class="bi bi-grid-3x3-gap"></i> {{ title|default('Tots els Productes') }}
+        </h1>
+        {% if show_new_button|default(false) %}
+            <a href="{{ path('app_product_new') }}" class="btn btn-success">
+                <i class="bi bi-plus-circle"></i> Nou Producte
+            </a>
+        {% endif %}
+    </div>
+
+    {# Comprovem si hi ha productes per mostrar #}
+    {% if products is empty %}
+        <div class="alert alert-info text-center py-5">
+            <i class="bi bi-info-circle" style="font-size: 2rem;"></i>
+            <p class="mt-2 mb-0 fs-5">{{ empty_message|default('No hi ha productes disponibles.') }}</p>
+            {% if app.user %}
+                <a href="{{ path('app_product_new') }}" class="btn btn-primary mt-3">
+                    <i class="bi bi-plus-circle"></i> Publica el teu primer producte
+                </a>
+            {% endif %}
+        </div>
+    {% else %}
+        {# Grid responsive de targetes de productes amb Bootstrap #}
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-xl-4 g-4">
+            {% for product in products %}
+                <div class="col">
+                    <div class="card h-100 shadow-sm border-0">
+                        {# Imatge del producte amb fallback #}
+                        {% if product.image %}
+                            <img src="{{ product.image }}"
+                                 class="card-img-top"
+                                 alt="{{ product.title }}"
+                                 loading="lazy"
+                                 onerror="this.onerror=null; this.src='https://placehold.co/400x200/e9ecef/6c757d?text=Sense+imatge';">
+                        {% else %}
+                            <img src="https://placehold.co/400x200/e9ecef/6c757d?text=Sense+imatge"
+                                 class="card-img-top"
+                                 alt="Sense imatge">
+                        {% endif %}
+
+                        <div class="card-body d-flex flex-column">
+                            {# Títol del producte #}
+                            <h5 class="card-title text-truncate" title="{{ product.title }}">
+                                {{ product.title }}
+                            </h5>
+
+                            {# Descripció truncada a 80 caràcters #}
+                            <p class="card-text text-muted small flex-grow-1">
+                                {{ product.description|length > 80 ? product.description|slice(0, 80) ~ '...' : product.description }}
+                            </p>
+
+                            {# Preu destacat #}
+                            <p class="card-text mb-2">
+                                <span class="badge bg-primary fs-6 px-3 py-2">
+                                    {{ product.price|number_format(2, ',', '.') }} €
+                                </span>
+                            </p>
+                        </div>
+
+                        {# Peu de la targeta amb info autor i data #}
+                        <div class="card-footer bg-white border-top-0">
+                            <small class="text-muted">
+                                <i class="bi bi-person"></i> {{ product.owner.name }}
+                                &middot;
+                                <i class="bi bi-calendar3"></i> {{ product.createdAt|date('d/m/Y') }}
+                            </small>
+
+                            {# Botó per veure detall #}
+                            <div class="mt-2">
+                                <a href="{{ path('app_product_show', {id: product.id}) }}"
+                                   class="btn btn-outline-primary btn-sm w-100">
+                                    <i class="bi bi-eye"></i> Veure detall
+                                </a>
+                            </div>
+
+                            {# Botons d'acció (Editar/Esborrar) - només si show_actions és true i és el propietari #}
+                            {% if show_actions|default(false) and app.user and app.user == product.owner %}
+                                <div class="d-flex gap-2 mt-2">
+                                    <a href="{{ path('app_product_edit', {id: product.id}) }}"
+                                       class="btn btn-warning btn-sm flex-fill">
+                                        <i class="bi bi-pencil"></i> Editar
+                                    </a>
+                                    {# Formulari d'esborrat amb token CSRF i confirmació JavaScript #}
+                                    <form method="post"
+                                          action="{{ path('app_product_delete', {id: product.id}) }}"
+                                          onsubmit="return confirm('Estàs segur que vols esborrar aquest producte?');"
+                                          class="flex-fill">
+                                        <input type="hidden" name="_token"
+                                               value="{{ csrf_token('delete' ~ product.id) }}">
+                                        <button type="submit" class="btn btn-danger btn-sm w-100">
+                                            <i class="bi bi-trash"></i> Esborrar
+                                        </button>
+                                    </form>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endblock %}

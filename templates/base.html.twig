@@ -1,0 +1,121 @@
+{# templates/base.html.twig #}
+{# Layout base de l'aplicació SymfoPop. #}
+{# Inclou Bootstrap 5 via CDN, navbar dinàmica i zona de missatges flash. #}
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SymfoPop - Mercat de Segona Mà{% endblock %}</title>
+
+    {# Bootstrap 5 CSS via CDN (sense integrity per evitar bloqueig) #}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    {# Bootstrap Icons #}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+    body { padding-top: 90px !important; }
+    </style>
+
+    {% block stylesheets %}{% endblock %}
+</head>
+<body>
+
+    {# ========== NAVBAR ========== #}
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top shadow-sm">
+        <div class="container">
+            <a class="navbar-brand" href="{{ path('app_home') }}">
+                <i class="bi bi-shop"></i> SymfoPop
+            </a>
+            <button class="navbar-toggler" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#navbarMain"
+                    aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarMain">
+                {# Menú esquerra #}
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('app_product_index') }}">
+                            <i class="bi bi-grid-3x3-gap"></i> Productes
+                        </a>
+                    </li>
+                    {% if app.user %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ path('app_my_products') }}">
+                                <i class="bi bi-box-seam"></i> Els meus productes
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ path('app_product_new') }}">
+                                <i class="bi bi-plus-circle"></i> Nou producte
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+
+                {# Menú dreta - Login/Registre o Usuari/Logout #}
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    {% if app.user %}
+                        <li class="nav-item">
+                            <span class="nav-link">
+                                <i class="bi bi-person-circle"></i> Hola, <strong>{{ app.user.name }}</strong>
+                            </span>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-warning" href="{{ path('app_logout') }}">
+                                <i class="bi bi-box-arrow-right"></i> Logout
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ path('app_login') }}">
+                                <i class="bi bi-box-arrow-in-right"></i> Login
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ path('app_register') }}">
+                                <i class="bi bi-person-plus"></i> Registre
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    {# ========== FLASH MESSAGES ========== #}
+    <div class="container mt-3">
+        {% for label, messages in app.flashes(['success', 'error', 'info', 'warning']) %}
+            {% for message in messages %}
+                <div class="alert alert-{{ label == 'error' ? 'danger' : label }} alert-dismissible fade show" role="alert">
+                    {% if label == 'success' %}<i class="bi bi-check-circle-fill"></i>
+                    {% elseif label == 'error' %}<i class="bi bi-exclamation-triangle-fill"></i>
+                    {% elseif label == 'warning' %}<i class="bi bi-exclamation-circle-fill"></i>
+                    {% else %}<i class="bi bi-info-circle-fill"></i>
+                    {% endif %}
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tancar"></button>
+                </div>
+            {% endfor %}
+        {% endfor %}
+    </div>
+
+    {# ========== CONTINGUT PRINCIPAL ========== #}
+    <main class="container py-3">
+        {% block body %}{% endblock %}
+    </main>
+
+    {# ========== FOOTER ========== #}
+    <footer class="mt-auto py-3 bg-dark text-center text-secondary">
+        <div class="container">
+            <p class="mb-0">&copy; {{ "now"|date("Y") }} SymfoPop - Mercat de Segona Mà | Oriol Torra</p>
+        </div>
+    </footer>
+
+    {# Bootstrap 5 JS Bundle (sense integrity) #}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    {% block javascripts %}{% endblock %}
+</body>
+</html>

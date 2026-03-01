@@ -1,0 +1,83 @@
+{# templates/product/show.html.twig #}
+{# Vista de detall d'un producte. #}
+{# Mostra tota la informació: imatge, títol, descripció, preu, autor. #}
+{# Botons Editar/Esborrar només visibles per al propietari. #}
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ product.title }} - SymfoPop{% endblock %}
+
+{% block body %}
+    {# Botó tornar #}
+    <a href="{{ path('app_product_index') }}" class="btn btn-outline-secondary mb-4">
+        <i class="bi bi-arrow-left"></i> Tornar al llistat
+    </a>
+
+    <div class="card shadow-sm border-0">
+        <div class="row g-0">
+            {# Columna imatge #}
+            <div class="col-md-5">
+                {% if product.image %}
+                    <img src="{{ product.image }}"
+                         class="img-fluid rounded-start h-100 w-100"
+                         style="object-fit: cover; min-height: 300px; max-height: 450px;"
+                         alt="{{ product.title }}"
+                         onerror="this.onerror=null; this.src='https://placehold.co/600x400/e9ecef/6c757d?text=Sense+imatge';">
+                {% else %}
+                    <img src="https://placehold.co/600x400/e9ecef/6c757d?text=Sense+imatge"
+                         class="img-fluid rounded-start h-100 w-100"
+                         style="object-fit: cover; min-height: 300px;"
+                         alt="Sense imatge">
+                {% endif %}
+            </div>
+
+            {# Columna informació #}
+            <div class="col-md-7">
+                <div class="card-body p-4">
+                    <h1 class="card-title mb-3">{{ product.title }}</h1>
+
+                    {# Preu destacat #}
+                    <p class="mb-3">
+                        <span class="badge bg-primary fs-4 px-4 py-2">
+                            {{ product.price|number_format(2, ',', '.') }} €
+                        </span>
+                    </p>
+
+                    {# Descripció completa #}
+                    <h5 class="text-muted">Descripció</h5>
+                    <p class="card-text mb-4">{{ product.description }}</p>
+
+                    {# Info venedor #}
+                    <div class="bg-light rounded p-3 mb-4">
+                        <h6 class="mb-2"><i class="bi bi-person-circle"></i> Informació del venedor</h6>
+                        <p class="mb-1"><strong>{{ product.owner.name }}</strong></p>
+                        <p class="mb-1 text-muted">
+                            <i class="bi bi-envelope"></i> {{ product.owner.email }}
+                        </p>
+                        <p class="mb-0 text-muted">
+                            <i class="bi bi-calendar3"></i> Publicat el {{ product.createdAt|date('d/m/Y \\a \\l\\e\\s H:i') }}
+                        </p>
+                    </div>
+
+                    {# Botons d'acció - només per al propietari #}
+                    {% if app.user and app.user == product.owner %}
+                        <div class="d-flex gap-2">
+                            <a href="{{ path('app_product_edit', {id: product.id}) }}"
+                               class="btn btn-warning">
+                                <i class="bi bi-pencil"></i> Editar
+                            </a>
+                            <form method="post"
+                                  action="{{ path('app_product_delete', {id: product.id}) }}"
+                                  onsubmit="return confirm('Estàs segur que vols esborrar aquest producte?');">
+                                <input type="hidden" name="_token"
+                                       value="{{ csrf_token('delete' ~ product.id) }}">
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="bi bi-trash"></i> Esborrar
+                                </button>
+                            </form>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

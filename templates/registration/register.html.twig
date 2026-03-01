@@ -1,0 +1,40 @@
+{# templates/registration/register.html.twig #}
+{# Formulari de registre amb nom, email, contrasenya i acceptació de termes. #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Registre - SymfoPop{% endblock %}
+
+{% block body %}
+    <div class="row justify-content-center">
+        <div class="col-md-5 col-lg-4">
+            <div class="card shadow-sm border-0 mt-4">
+                <div class="card-body p-4">
+                    <h2 class="card-title text-center mb-4">
+                        <i class="bi bi-person-plus text-success"></i>
+                        <br>Crear Compte
+                    </h2>
+
+                    {{ form_start(registrationForm) }}
+                        {{ form_row(registrationForm.name) }}
+                        {{ form_row(registrationForm.email) }}
+                        {{ form_row(registrationForm.plainPassword) }}
+
+                        <div class="mb-3">
+                            {{ form_row(registrationForm.agreeTerms) }}
+                        </div>
+
+                        <button type="submit" class="btn btn-success w-100 mb-3">
+                            <i class="bi bi-person-plus"></i> Registrar-me
+                        </button>
+                    {{ form_end(registrationForm) }}
+
+                    <hr>
+                    <p class="text-center text-muted mb-0">
+                        Ja tens compte?
+                        <a href="{{ path('app_login') }}">Inicia sessió aquí</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

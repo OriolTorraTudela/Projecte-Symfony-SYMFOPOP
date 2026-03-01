@@ -1,0 +1,50 @@
+# config/packages/security.yaml
+#
+# Configuració del sistema de seguretat de Symfony.
+# Defineix com s'autentiquen els usuaris, el hashejat de contrasenyes,
+# les rutes protegides i la funcionalitat "remember me".
+#
+security:
+    # Algoritme de hashejat de contrasenyes - auto utilitza bcrypt o argon2
+    password_hashers:
+        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
+
+    # Proveïdors d'usuaris - com Symfony carrega els usuaris
+    providers:
+        app_user_provider:
+            entity:
+                class: App\Entity\User
+                property: email  # L'email és l'identificador únic per al login
+
+    # Firewalls - defineixen les regles de seguretat per cada zona
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+        main:
+            lazy: true
+            provider: app_user_provider
+
+            # Configuració del formulari de login
+            form_login:
+                login_path: app_login
+                check_path: app_login
+                default_target_path: app_product_index
+                username_parameter: email      # <-- Camp del formulari que conté l'email
+                password_parameter: password    # <-- Camp del formulari que conté la contrasenya
+                enable_csrf: true
+
+            # Configuració del logout
+            logout:
+                path: app_logout
+                target: app_home
+
+            # Funcionalitat "Recorda'm" per sessions persistents
+            remember_me:
+                secret: '%kernel.secret%'
+                lifetime: 604800  # 1 setmana
+                path: /
+
+    # Control d'accés
+    access_control:
+        # Les restriccions es gestionen amb #[IsGranted] als controladors

@@ -1,0 +1,35 @@
+{# templates/product/new.html.twig #}
+{# Formulari per crear un nou producte. #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Nou Producte - SymfoPop{% endblock %}
+
+{% block body %}
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4">
+                    <h1 class="card-title mb-4">
+                        <i class="bi bi-plus-circle text-success"></i> Crear Nou Producte
+                    </h1>
+
+                    {{ form_start(form) }}
+                        {{ form_row(form.title) }}
+                        {{ form_row(form.description) }}
+                        {{ form_row(form.price) }}
+                        {{ form_row(form.image) }}
+
+                        <div class="d-flex gap-2 mt-4">
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-check-circle"></i> Crear Producte
+                            </button>
+                            <a href="{{ path('app_product_index') }}" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Cancel·lar
+                            </a>
+                        </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
